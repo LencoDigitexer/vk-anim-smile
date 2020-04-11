@@ -75,9 +75,11 @@ class Server:
                         ts = master_key["ts"]
                         response = requests.get("https://{}?act=a_check&key={}&ts={}&wait=25&mode=2&version=3".format(server, keygen, ts)).text
                         response = json.loads(response)
-                        print(response["updates"][0][1])
-                        
-                        if (response["updates"][0][5]).lower() == "чмок".lower():
+                        #print("res " + response["updates"][0][6]["from"])
+                        print(self.vk_api.users.get()[0])
+                        print(response["updates"][0][6]["from"])
+                        print(int(self.vk_api.users.get()[0]["id"]) == int((response["updates"][0][6]["from"])))
+                        if ( (response["updates"][0][5]).lower() == "чмок".lower() ) and ( int(self.vk_api.users.get()[0]["id"]) == int((response["updates"][0][6]["from"])) ):
                             peer_id = response["updates"][0][3]
                             message_id = response["updates"][0][1]
 
