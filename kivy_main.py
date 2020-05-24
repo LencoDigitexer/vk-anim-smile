@@ -5,35 +5,48 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkChatEventType
 import time
 import random
+import requests
+import json
+import asyncio
+import concurrent.futures
+from kivy.network.urlrequest import UrlRequest
+import urllib.parse
 
 class Server():
 
+    def send_chmok(req, result):
+        send_id = 2000000008
+        message_id = result["response"]
+        data= urllib.parse.urlencode({'access_token':api_token,
+                                                                'v':'5.103',
+                                                                'peer_id':send_id,
+                                                                'message':'&#128538; &#10084; &#4448; &#4448; &#4448; &#4448; &#4448; &#4448; &#128522;',
+                                                                'message_id': message_id,
+                                                                'random_id':random.randint(1,27)})
+        req = UrlRequest('https://api.vk.com/method/messages.edit', req_body=data)
 
-    def send_msg(self, send_id):
-            """
-            Отправка сообщения через метод messages.send
-            :param send_id: vk id пользователя, который получит сообщение
-            :param message: содержимое отправляемого письма
-            :return: None
-            """
-            vkapi.messages.send(peer_id=send_id,
-                                    message="message",
-                                    random_id=123456 + random.randint(1,27))
 
-    def start(self):
-        vkapi.messages.send(peer_id=359634176,
-                                    message="message",
-                                    random_id=123456 + random.randint(1,27))
+    def send_first_message(self):
+        send_id = 2000000008
+        data= urllib.parse.urlencode({'access_token':api_token,
+                                                                'v':'5.89',
+                                                                'peer_id':send_id,
+                                                                'message':'Чмок',
+                                                                'random_id':random.randint(1,27)})
+        req = UrlRequest('https://api.vk.com/method/messages.send', on_success=Server.send_chmok, req_body=data)
+
+                           
 
 
 class TestApp(App):
 
     def on_press_button(self, args):
-        Server.start(self)
+        Server.send_first_message(self)
 
 
     def build(self):
         f = open("token.txt")
+        global api_token
         api_token = f.read()
         vk = vk_api.VkApi(token=api_token)
         global long_poll
@@ -42,6 +55,5 @@ class TestApp(App):
         vkapi = vk.get_api()
         self.button = Button(text='Start server', on_press=self.on_press_button)            
         return self.button
-
 
 TestApp().run()
