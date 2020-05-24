@@ -33,27 +33,33 @@ class Server():
                                                                 'peer_id':send_id,
                                                                 'message':'Чмок',
                                                                 'random_id':random.randint(1,27)})
+        print(data)                                                        
         req = UrlRequest('https://api.vk.com/method/messages.send', on_success=Server.send_chmok, req_body=data)
+
 
                            
 
 
 class TestApp(App):
 
-    def on_press_button(self, args):
-        Server.send_first_message(self)
+    def make_new_text(self, req, result):
+        self.button.text = "test"
+        print(result["response"][0])
+        self.button.text = str("Привет, " + result["response"][0]["first_name"])
 
+    def press(self, instance, **kwargs):
+        send_id = 2000000008
+        data= urllib.parse.urlencode({'access_token':api_token, 'v':'5.89'})
+        print(data)                                                        
+        req = UrlRequest('https://api.vk.com/method/users.get', on_success=self.make_new_text, req_body=data)
+    
 
     def build(self):
         f = open("token.txt")
         global api_token
         api_token = f.read()
-        vk = vk_api.VkApi(token=api_token)
-        global long_poll
-        long_poll = VkLongPoll(vk)
-        global vkapi 
-        vkapi = vk.get_api()
-        self.button = Button(text='Start server', on_press=self.on_press_button)            
+
+        self.button = Button(text='Start server', on_press=self.press)            
         return self.button
 
 TestApp().run()
